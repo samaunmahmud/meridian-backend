@@ -28,12 +28,18 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!--
-          NOTE: spring-boot-starter-data-jpa, the postgresql driver, and quartz
-          are deliberately NOT added yet. We add a dependency only when we're
-          about to use it — adding JPA now, with no database configured, would
-          make the app fail to start. These come back in Step 2.
-        -->
+        <!-- Talks to Postgres using JPA (so we write Java, not raw SQL, for basic queries) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- The actual Postgres driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Testing tools: JUnit 5 + Mockito, already bundled -->
         <dependency>
