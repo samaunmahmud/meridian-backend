@@ -3,6 +3,9 @@ package com.meridian.backend.service;
 import com.meridian.backend.client.AlphaVantageClient;
 import com.meridian.backend.client.GlobalQuote;
 import com.meridian.backend.client.GlobalQuoteResponse;
+import com.meridian.backend.dto.PricePointResponse;
+import com.meridian.backend.dto.TickerResponse;
+import com.meridian.backend.exception.TickerNotFoundException;
 import com.meridian.backend.model.PriceHistory;
 import com.meridian.backend.model.Ticker;
 import com.meridian.backend.repository.PriceHistoryRepository;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class MarketDataService {
@@ -48,5 +52,20 @@ public class MarketDataService {
         priceHistoryRepository.save(priceHistory);
 
         log.info("Saved price for {}: {}", symbol, price);
+    }
+
+    public List<TickerResponse> getAllTickers() {
+        return tickerRepository.findAll().stream()
+                .map(t -> new TickerResponse(t.getSymbol(), t.getName(), t.getExchange()))
+                .toList();
+    }
+
+    public List<PricePointResponse> getPriceHistory(String symbol) {
+        Ticker ticker = tickerRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new TickerNotFoundException(symbol));
+
+        return priceHistoryRepository.findByTickerIdOrderByRecordedAtDesc(ticker.getId()).stream()
+                .map(p -> new PricePointResponse(p.getPrice(), p.getRecordedAt()))
+                .toList();
     }
 }
